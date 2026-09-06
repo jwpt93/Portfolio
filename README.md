@@ -4,6 +4,8 @@ Public-facing documentation for my modelling work. Source code lives in
 private repositories; what is published here is model description,
 methodology and validation results.
 
+[About](about.md) · [Publications](publications.md)
+
 ## Projects
 
 ### [FireModel](firemodel/) — three-dimensional fire spread solver
