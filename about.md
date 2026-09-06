@@ -1,18 +1,16 @@
 # About
 
-Joseph W. Talbot. Aerospace engineer working in combustor and inlet
-aerodynamics, with a background in computational fluid dynamics,
-multiphase flow and propulsion.
+Joseph W. Talbot. Experienced Aerospace Engineer; Specializing in Computational Fluid Dynamics for Multiphase and Reacting Flows with a Background in Both Solver Development and Application
 
 ## Positions
 
 | Years | Organisation | Title |
 |---|---|---|
-| 2022 – present | GE Aerospace | Combustor / Inlet Aerodynamics Design Engineer |
+| 2022 – present | GE Aerospace | Combustor Aerodynamics Design Engineer |
 | 2020 – 2021 | CFD Research Corporation | Research Engineer |
 | 2019 – 2020 | GE Aviation | Aeromechanics Engineer |
-| 2019 | AFRL Directed Energy Directorate | AFRL Scholar |
-| 2016 – 2017 | Independent contracting | Software / Systems Engineer |
+| 2019 | AFRL | AFRL Scholar |
+| 2016 – 2017 | Contracting | Software / Systems Engineer |
 
 ## Education
 
