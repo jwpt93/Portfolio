@@ -1,23 +1,21 @@
 # Portfolio
 
-Public-facing documentation for my modelling work. Source code
-lives in private repositories; what is published here is background,
-methodology, and validation results.
+Public-facing documentation for my modelling work. Source code lives in
+private repositories; what is published here is model description,
+methodology and validation results.
 
 ## Projects
 
-### [FireModel](firemodel/) — reduced-order fire spread and burning model
+### [FireModel](firemodel/) — three-dimensional fire spread solver
 
-A physics-based model of how solid fuels ignite, burn and spread fire,
-built to give a defensible pre-suppression baseline for testing fire
-suppression devices. Three tiers: a bench-scale cone-calorimeter model,
-a one-dimensional flame-line spread model, and a three-dimensional
-reacting-flow solver with a particle-resolved fuel bed.
+A reacting-flow model of fire spread through a porous fuel bed, with a
+particle-resolved bed and a level-set fire front, built as a
+pre-suppression baseline for testing fire suppression devices.
 
-- [Background](firemodel/README.md) — what the model is, what it is for,
-  how the work is run
-- [Cheney 1993 grassland fires](firemodel/cheney_1993/README.md) — a
-  worked validation case, end to end
+- [Model description](firemodel/README.md) — physics, numerics,
+  working practice, work to come
+- [Cheney 1993 grassland fires](firemodel/cheney_1993/README.md) —
+  validation case
 
 ![Grassland fire spread at U10 = 6 m/s](firemodel/cheney_1993/spread_U10_6.gif)
 

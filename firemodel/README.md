@@ -1,97 +1,94 @@
-# FireModel — background
+# FireModel — three-dimensional fire spread solver
 
-FireModel is a reduced-order model (ROM) of how solid fuels heat up,
-ignite, burn and carry fire across a fuel bed. The reason it exists is
-practical: to test a fire suppression device you need to know what the
-fire would have done without it, at a level of detail that a
-closed-form spread correlation cannot give and a full CFD fire model
-cannot give quickly. FireModel sits between those two.
+FireModel is a reduced-order model of how solid fuels heat, ignite, burn
+and carry fire across a fuel bed. Its purpose is to provide a
+pre-suppression baseline for testing fire suppression devices. This page
+describes the three-dimensional solver as it stands. The
+[Cheney 1993 case](cheney_1993/README.md) shows it against experiment.
 
-This page is background only. The validation write-ups linked from the
-[portfolio index](../README.md) show the model against experiments.
+## Physics
 
-## What it models
+**Gas phase.** Low-Mach variable-density Navier–Stokes on a stretched
+Cartesian grid. Momentum carries the Reynolds stress from a k-epsilon
+turbulence closure with buoyancy production. Species transport for fuel
+gas, oxygen and products in conservative form. Energy in enthalpy form
+with turbulent diffusion.
 
-The code has three tiers that share one fuel description and one set of
-material properties.
+**Combustion.** Eddy Dissipation Concept closure for the pyrolysis-gas
+reaction, with a fine-structure residence time scaled from the local
+turbulence state.
 
-**Tier 1 — bench-scale burning (cone calorimeter).** A one-dimensional
-slab under a prescribed radiant heat flux. Conduction is solved either
-with a small number of lumped nodes or a method-of-lines spatial
-discretisation. Pyrolysis is single- or multi-step Arrhenius kinetics
-with optional rate limits (char availability, front-limited regression
-for melting polymers). A flame state machine feeds radiation back to the
-surface using a De Ris / Tewarson closure. Outputs are heat release rate
-and mass loss rate per unit area against time. Validated against
-published cone data for PMMA (University of Maryland), fire-retardant
-particle board (RISE), and crop straw (Chen et al. 2021).
+**Radiation.** Discrete-ordinates method, absorbing-emitting gas and
+solid, solved to a fixed source-iteration tolerance. Solid absorption
+uses an extinction coefficient built from particle surface area and an
+orientation factor.
 
-**Tier 2 — one-dimensional flame-line spread.** A cascade of Tier 1 fuel
-elements along the wind direction. Each downwind element receives
-radiation from every burning element upwind (Albini 1981/1985 line-source
-view factors with Beer-Lambert attenuation) plus convective preheating
-from the tilted flame. It produces a spread rate and a per-element
-burning history in seconds of compute.
+**Fuel bed.** Lagrangian particles distributed through the bed volume.
+Each particle carries temperature, moisture, dry mass and char mass and
+follows its own drying, single-step Arrhenius pyrolysis, char oxidation
+and smouldering, with the solid oxidation reactions drawing down local
+oxygen. Particles exchange heat with the gas by convection (Nusselt
+correlation for a cylinder in cross-flow), radiation, and momentum by
+drag. Soil conduction below the bed.
 
-**Tier 3 — three-dimensional reacting flow.** A low-Mach finite-volume
-solver on a stretched Cartesian grid:
+**Fire front.** A level-set function tracks the front position for
+diagnostics and spread-rate measurement. An empirical spread-rate
+hybrid can drive the front below a wind threshold; it is inactive in
+the cases published here.
 
-- k-epsilon turbulence with the Reynolds stress carried in momentum
-- Eddy Dissipation Concept combustion of the pyrolysis gases
-- Discrete-ordinates thermal radiation, solved in parallel over ordinates
-- A Lagrangian fuel bed: each particle has its own drying, pyrolysis,
-  char oxidation and smouldering, and exchanges heat, mass and drag with
-  the gas
-- Level-set tracking of the fire front, with an optional empirical
-  spread-rate hybrid for the low-wind regime where averaged turbulence
-  closures cannot sustain flame contact
-- Pressure projection with a separable-FFT preconditioned Krylov solve
+**Boundaries.** Logarithmic inlet wind profile with wall functions,
+open outlet with a sponge layer, fuel-free buffers between the bed and
+both open boundaries, periodic or symmetric lateral faces.
 
-It is written in Python with numba-compiled kernels and runs a 60 m
-grassland fire at 100 mm resolution in tens of minutes on a desktop.
+## Numerics
 
-## How the work is run
+- Finite-volume, second-order MUSCL advection, per-cell diffusive
+  timestep limit, explicit time integration.
+- Pressure projection with a separable-FFT preconditioned BiCGSTAB
+  solve.
+- Discrete-ordinates radiation parallelised over ordinates.
+- Python with numba-compiled kernels; production runs use 12 threads.
+- Every parallel kernel uses a read-old, write-new double-buffer
+  pattern and is bit-exact reproducible across runs at a fixed thread
+  count.
 
-The model is only as useful as the trust you can place in its numbers,
-so the project runs under a written set of rules that every change has
-to satisfy. The ones that matter most:
+## Working practice
 
-- **Every parameter has a source.** A value in an input deck cites a
-  measurement database, a paper, or the calibration case it came from.
-  Before any validation run, every case-defining parameter is traced
-  back to the experiment being reproduced. A missing value stops the
-  run; it is never filled with something plausible from another case.
-- **Calibration and validation are split in advance.** One exposure
-  condition per material may be tuned. Every other condition is
-  validation only and may not be tuned to, however badly it fails.
-- **Acceptance bands are fixed before results are seen** and may not be
+- Every input parameter carries its source in the deck: measurement
+  database, paper, or calibration case.
+- Every case-defining parameter is traced to the experiment before a
+  validation run starts. A missing value blocks the run.
+- One calibration condition per material; all other conditions are
+  validation only.
+- Acceptance bands are written down before results are seen and are not
   widened afterwards.
-- **A failed validation is information, not a bug.** The physical
-  reason is documented and accepted as a known limitation rather than
-  tuned away.
-- **Bit-exact determinism.** Two runs of the same case on the same
-  thread count must agree to the last digit. Every parallel kernel
-  ships with a unit test that checks this, because without it a
-  physics change cannot be told apart from a scheduling roll.
-- **Names carry units.** A fuel surface-area-to-volume ratio is
-  `fuel_element_sav_per_m`, not `sigma`. This rule was written after a
-  value in ft⁻¹ sat in a field labelled m⁻¹ for months and skewed a
-  parameter that feeds eight physics terms by a factor of 3.28. The
-  Cheney write-up describes what that cost.
+- A validation result outside the band is recorded with its physical
+  cause and carried as a known limitation.
+- Non-measurable parameters are identical across all cases of the same
+  material.
+- Each new kernel ships with unit tests for bit-exact determinism and
+  at least one conservation, limiting-case or bounds check.
+- Recent validation cases are re-run before physics changes are
+  committed.
+- Variable names carry the quantity and its units.
 
 Roughly 35 000 lines of model code and 85 test modules at the time of
 writing.
 
-## Where it stands
+## Work to come
 
-Tier 1 is stable and validated across several materials. Tier 3 is
-active research: it reproduces the measured spread rate of open
-grassland fires at moderate to high wind, but its wind sensitivity is
-too steep and the low-wind regime needs the empirical hybrid. The
-[Cheney 1993 case](cheney_1993/README.md) shows both the agreement and
-the open problems with the actual numbers.
+- Re-run the wind sweep on a 113 m domain with fuel-free buffers at both
+  ends, so that the spread-rate fit window is clear of outlet backflow.
+- Resolve the wind exponent: the model spreads as U₂ to the power 1.46
+  against 0.99 measured.
+- Characterise the 7 to 9 s surge cycle in the spread rate and its
+  coupling to the turbulence field.
+- Extend from the two-dimensional slice to a finite fireline with
+  lateral spread.
+- Add a suppression module (water spray, agent application) on top of
+  the validated baseline.
 
-## Selected references
+## References
 
 - Cheney, N. P., Gould, J. S., Catchpole, W. R. (1993). The influence of
   fuel, weather and fire shape variables on fire-spread in grasslands.
@@ -99,11 +96,6 @@ the open problems with the actual numbers.
 - Mell, W., Jenkins, M. A., Gould, J., Cheney, P. (2007). A physics-based
   approach to modelling grassland fires. *International Journal of
   Wildland Fire* 16(1), 1–22.
-- Albini, F. A. (1985). A model for fire spread in wildland fuels by
-  radiation. *Combustion Science and Technology* 42, 229–258.
-- Di Blasi, C. (2008). Modeling chemical and physical processes of wood
-  and biomass pyrolysis. *Progress in Energy and Combustion Science*
-  34(1), 47–90.
-- Marsden-Smedley, J. B., Catchpole, W. R. (1995). Fire behaviour
-  modelling in Tasmanian buttongrass moorlands II. Fire behaviour.
-  *International Journal of Wildland Fire* 5(4), 215–228.
+- Magnussen, B. F. (1981). On the structure of turbulence and a
+  generalized eddy dissipation concept for chemical reaction in
+  turbulent flow. 19th AIAA Aerospace Sciences Meeting.
