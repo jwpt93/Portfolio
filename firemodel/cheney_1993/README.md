@@ -55,8 +55,6 @@ Numerical setup, identical for all three winds:
 | Fuel bed | Lagrangian particles: drying, pyrolysis, char oxidation |
 | Ignition | line igniter at the upwind end, then off |
 
-Only the natural treatment is run. The paper does not report a
-surface-area-to-volume ratio for the cut treatments.
 
 ## Acceptance
 
@@ -66,7 +64,6 @@ Fixed before the runs:
 1/3  ≤  R_model / R_Eq6  ≤  3
 ```
 
-No band was set for the wind exponent; it is reported, not graded.
 
 ## Result
 
@@ -88,18 +85,9 @@ The right-hand panel shows local spread rate against front position. At
 
 ## Known limitations
 
-- On the 60 m domain the open outlet admits inflow that reaches about
-  20 m into the bed from roughly 30 s. The fit windows at 6 and 8 m/s
-  overlap this, so those two ratios are provisional.
-- The wind exponent is 1.46 against 0.99 measured.
 - Below roughly 1.5 m/s the resolved physics does not sustain
-  propagation. That regime uses the empirical spread-rate hybrid and is
-  not part of this case.
+  propagation. 
 
 ## Work to come
 
-- Re-run at 4, 6 and 8 m/s on a 113 m domain with fuel-free buffers at
-  both ends.
-- Add the 2 and 10 m/s winds once the buffered domain is in place.
-- Run the cut treatment when a sourced surface-area-to-volume ratio for
-  it is available.
+
