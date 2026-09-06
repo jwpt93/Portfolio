@@ -1,8 +1,8 @@
 # Portfolio
 
-Public-facing documentation and demos for my modelling work. Source code
+Public-facing documentation for my modelling work. Source code
 lives in private repositories; what is published here is background,
-methodology, validation results and links to runnable apps.
+methodology, and validation results.
 
 ## Projects
 
@@ -20,12 +20,6 @@ reacting-flow solver with a particle-resolved fuel bed.
   worked validation case, end to end
 
 ![Grassland fire spread at U10 = 6 m/s](firemodel/cheney_1993/spread_U10_6.gif)
-
-### [FireWebApp](https://github.com/jwpt93/FireWebApp) — interactive grass-fire spread demo
-
-A browser applet built on the Cheney 1993 regression with a level-set
-fire front, so you can move wind and moisture sliders and watch the
-front respond. Plain JavaScript, no build step.
 
 ## Licence
 
