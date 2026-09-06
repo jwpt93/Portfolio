@@ -17,12 +17,10 @@ duct at right.*
 |---|---|
 | Fluid phase | Steady compressible RANS, pressure-based, k-omega SST |
 | Particle phase | Lagrangian, one-way coupled, no particle–particle interaction |
-| Size distribution | Polydisperse, tabulated A4 test sand, 43.5 µm mean |
+| Size distribution | Polydisperse, tabulated test-sand distribution, 43.5 µm mean |
 | Injection | 10 000 parcels across the inlet, spherical drag, particle rotation carried |
 | Wall interaction | Empirical, impulse-based, and rough-wall rebound models |
 | Solver | ANSYS Fluent, 2D double precision |
-
-![A4 sand cumulative size distribution](figures/a4_sand_cdf.png)
 
 ## Wall rebound models
 
@@ -102,8 +100,8 @@ Roughness values used, for a 200 µm particle:
 
 ## Comparison: 2D inertial particle separator
 
-Case from Barone, Loth and Snyder (2012). A4 sand, 1.71 lbm/s core
-flow, 0.428 lbm/s scavenge flow, 20 % scavenge ratio.
+Case from Barone, Loth and Snyder (2012). Test sand as above,
+1.71 lbm/s core flow, 0.428 lbm/s scavenge flow, 20 % scavenge ratio.
 
 | Rebound model | Scavenge efficiency |
 |---|---|
