@@ -8,17 +8,25 @@ devices. Validation: [Cheney 1993 grassland fires](cheney_1993/README.md).
 
 Low-Mach, variable density, Reynolds-averaged.
 
+Mass, with the solid-to-gas source:
+
 $$
 \partial_t \rho + \nabla\cdot(\rho \mathbf{u}) = \dot{m}'''_{s \to g}
 $$
+
+Momentum, with Reynolds stress, buoyancy and bed drag:
 
 $$
 \partial_t(\rho\mathbf{u}) + \nabla\cdot(\rho\mathbf{u}\mathbf{u}) = -\nabla p + \nabla\cdot\left[(\mu+\mu_t)\mathbf{S}\right] + (\rho-\rho_\infty)\mathbf{g} - \mathbf{f}_{D}
 $$
 
+Species transport, turbulent diffusion, reaction source:
+
 $$
 \partial_t(\rho Y_i) + \nabla\cdot(\rho\mathbf{u}Y_i) = \nabla\cdot\left(\rho\left(D+\tfrac{\nu_t}{Sc_t}\right)\nabla Y_i\right) + \dot\omega_i
 $$
+
+Enthalpy, with combustion heating, radiation and heat lost to the bed:
 
 $$
 \partial_t(\rho h) + \nabla\cdot(\rho\mathbf{u}h) = \nabla\cdot\left(\rho\left(\alpha+\tfrac{\nu_t}{Pr_t}\right)\nabla h\right) + \dot{q}'''_{c} - \nabla\cdot\mathbf{q}_{r} - \dot{q}'''_{s \to g}
@@ -31,6 +39,8 @@ $\mu_{t} = C_{\mu} \rho k^{2}/\varepsilon$, wall functions at the ground.
 
 Eddy Dissipation Concept, single-step fuel gas + oxygen:
 
+Reaction rate and fine-structure scales:
+
 $$
 \dot\omega_F = \rho\frac{\gamma^{\ast}}{\tau^{\ast}} \min\left(Y_F, \frac{Y_{O_2}}{s}\right), \qquad \tau^{\ast} \propto \sqrt{\nu/\varepsilon}, \quad \gamma^{\ast} \propto \left(\frac{\nu\varepsilon}{k^2}\right)^{1/4}
 $$
@@ -39,6 +49,8 @@ $$
 
 Discrete ordinates on the grey radiative transfer equation, gas and
 solid absorbing–emitting:
+
+Radiative transfer, solid extinction from bed geometry:
 
 $$
 \mathbf{s}\cdot\nabla I = \kappa\left(\frac{\sigma T^4}{\pi} - I\right), \qquad \kappa = \kappa_g + \kappa_s, \quad \kappa_s = \xi\beta_s\sigma_s
@@ -52,13 +64,19 @@ surface-area-to-volume ratio, $\xi$ an orientation factor.
 Lagrangian particles, each carrying $T_p$, water mass $m_w$, dry
 mass $m_d$, char mass $m_c$:
 
+Particle energy balance:
+
 $$
 m_p c_p \frac{dT_p}{dt} = h A_p (T_g - T_p) + A_p\varepsilon_p\left(G/4 - \sigma T_p^4\right) - \dot m_w L_v - \dot m_d \Delta h_{py} + \dot m_c \Delta h_{ox}
 $$
 
+Drying and pyrolysis, Arrhenius:
+
 $$
 \dot m_w = -A_w m_w \exp\left(-\frac{E_w}{R T_p}\right), \qquad \dot m_d = -A_{py} m_d \exp\left(-\frac{E_{py}}{R T_p}\right)
 $$
+
+Char oxidation:
 
 $$
 \dot m_c = -A_{ox} m_c Y_{O_2}\exp\left(-\frac{E_{ox}}{R T_p}\right) \quad\text{(diffusion-limited)}
@@ -69,6 +87,8 @@ $d = 4/\sigma_s$. Drag $\mathbf{f}_{D}$ from the same geometry. Pyrolysis
 gas and water vapour enter the gas-phase source terms.
 
 ## Fire front
+
+Front propagation, level set:
 
 $$
 \partial_t \phi + v_n|\nabla\phi| = 0
@@ -84,25 +104,9 @@ the published cases.
   per-cell diffusive limit.
 - Pressure projection, separable-FFT preconditioned BiCGSTAB.
 - DOM parallelised over ordinates.
-- Python + numba kernels, 12 threads; bit-exact reproducible at fixed
-  thread count.
-
-## Working practice
-
-- Every deck parameter cites its source.
-- Case parameters traced to the experiment before a run; a missing
-  value blocks the run.
-- One calibration condition per material; the rest are validation only.
-- Acceptance bands fixed before results are seen.
-- Out-of-band results recorded with physical cause as known limitations.
-- Kernels ship with determinism and conservation/bounds unit tests.
 
 ## Work to come
 
-- Wind sweep on a 113 m domain with fuel-free buffers at both ends.
-- Wind exponent: model 1.46, measured 0.99.
-- Surge cycle in spread rate, 7–9 s period.
-- Finite fireline with lateral spread.
 - Suppression module on the validated baseline.
 
 ## References
