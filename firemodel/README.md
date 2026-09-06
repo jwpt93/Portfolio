@@ -1,101 +1,127 @@
 # FireModel — three-dimensional fire spread solver
 
-FireModel is a reduced-order model of how solid fuels heat, ignite, burn
-and carry fire across a fuel bed. Its purpose is to provide a
-pre-suppression baseline for testing fire suppression devices. This page
-describes the three-dimensional solver as it stands. The
-[Cheney 1993 case](cheney_1993/README.md) shows it against experiment.
+Reduced-order reacting-flow model of fire spread through a porous fuel
+bed. Purpose: a pre-suppression baseline for testing fire suppression
+devices. Validation: [Cheney 1993 grassland fires](cheney_1993/README.md).
 
-## Physics
+## Gas phase
 
-**Gas phase.** Low-Mach variable-density Navier–Stokes on a stretched
-Cartesian grid. Momentum carries the Reynolds stress from a k-epsilon
-turbulence closure with buoyancy production. Species transport for fuel
-gas, oxygen and products in conservative form. Energy in enthalpy form
-with turbulent diffusion.
+Low-Mach, variable density, Reynolds-averaged.
 
-**Combustion.** Eddy Dissipation Concept closure for the pyrolysis-gas
-reaction, with a fine-structure residence time scaled from the local
-turbulence state.
+$$
+\partial_t \rho + \nabla\cdot(\rho \mathbf{u}) = \dot m'''_{s\to g}
+$$
 
-**Radiation.** Discrete-ordinates method, absorbing-emitting gas and
-solid, solved to a fixed source-iteration tolerance. Solid absorption
-uses an extinction coefficient built from particle surface area and an
-orientation factor.
+$$
+\partial_t(\rho\mathbf{u}) + \nabla\cdot(\rho\mathbf{u}\mathbf{u})
+= -\nabla p + \nabla\cdot\big[(\mu+\mu_t)\,\mathbf{S}\big]
++ (\rho-\rho_\infty)\mathbf{g} - \mathbf{f}_D
+$$
 
-**Fuel bed.** Lagrangian particles distributed through the bed volume.
-Each particle carries temperature, moisture, dry mass and char mass and
-follows its own drying, single-step Arrhenius pyrolysis, char oxidation
-and smouldering, with the solid oxidation reactions drawing down local
-oxygen. Particles exchange heat with the gas by convection (Nusselt
-correlation for a cylinder in cross-flow), radiation, and momentum by
-drag. Soil conduction below the bed.
+$$
+\partial_t(\rho Y_i) + \nabla\cdot(\rho\mathbf{u}Y_i)
+= \nabla\cdot\Big(\rho\big(D+\tfrac{\nu_t}{Sc_t}\big)\nabla Y_i\Big) + \dot\omega_i
+$$
 
-**Fire front.** A level-set function tracks the front position for
-diagnostics and spread-rate measurement. An empirical spread-rate
-hybrid can drive the front below a wind threshold; it is inactive in
-the cases published here.
+$$
+\partial_t(\rho h) + \nabla\cdot(\rho\mathbf{u}h)
+= \nabla\cdot\Big(\rho\big(\alpha+\tfrac{\nu_t}{Pr_t}\big)\nabla h\Big)
++ \dot q'''_{c} - \nabla\cdot\mathbf{q}_r - \dot q'''_{s\to g}
+$$
 
-**Boundaries.** Logarithmic inlet wind profile with wall functions,
-open outlet with a sponge layer, fuel-free buffers between the bed and
-both open boundaries, periodic or symmetric lateral faces.
+Turbulence: standard $k$–$\varepsilon$ with shear and buoyancy
+production, $\mu_t = C_\mu \rho k^2/\varepsilon$, wall functions at
+the ground.
+
+## Combustion
+
+Eddy Dissipation Concept, single-step fuel gas + oxygen:
+
+$$
+\dot\omega_F = \rho\,\frac{\gamma^{*}}{\tau^{*}}\,
+\min\!\Big(Y_F,\ \frac{Y_{O_2}}{s}\Big), \qquad
+\tau^{*} \propto \sqrt{\nu/\varepsilon}, \quad
+\gamma^{*} \propto \Big(\frac{\nu\varepsilon}{k^2}\Big)^{1/4}
+$$
+
+## Radiation
+
+Discrete ordinates on the grey radiative transfer equation, gas and
+solid absorbing–emitting:
+
+$$
+\mathbf{s}\cdot\nabla I = \kappa\left(\frac{\sigma T^4}{\pi} - I\right),
+\qquad \kappa = \kappa_g + \kappa_s, \quad
+\kappa_s = \xi\,\beta_s\,\sigma_s
+$$
+
+with $\beta_s$ the solid packing ratio, $\sigma_s$ the particle
+surface-area-to-volume ratio, $\xi$ an orientation factor.
+
+## Fuel bed
+
+Lagrangian particles, each carrying $T_p$, water mass $m_w$, dry
+mass $m_d$, char mass $m_c$:
+
+$$
+m_p c_p \frac{dT_p}{dt}
+= h A_p (T_g - T_p) + A_p\,\varepsilon_p\big(G/4 - \sigma T_p^4\big)
+- \dot m_w L_v - \dot m_d \Delta h_{py} + \dot m_c \Delta h_{ox}
+$$
+
+$$
+\dot m_w = -A_w m_w \exp\!\Big(-\frac{E_w}{R T_p}\Big), \qquad
+\dot m_d = -A_{py} m_d \exp\!\Big(-\frac{E_{py}}{R T_p}\Big)
+$$
+
+$$
+\dot m_c = -A_{ox} m_c\, Y_{O_2}\exp\!\Big(-\frac{E_{ox}}{R T_p}\Big)
+\quad\text{(diffusion-limited)}
+$$
+
+Convection $h$ from a cylinder-in-crossflow Nusselt correlation,
+$d = 4/\sigma_s$. Drag $\mathbf{f}_D$ from the same geometry. Pyrolysis
+gas and water vapour enter the gas-phase source terms.
+
+## Fire front
+
+$$
+\partial_t \phi + v_n|\nabla\phi| = 0
+$$
+
+$v_n$ from the resolved bed ignition front; an empirical
+$v_n(U, M)$ hybrid is available below a wind threshold and is off in
+the published cases.
 
 ## Numerics
 
-- Finite-volume, second-order MUSCL advection, per-cell diffusive
-  timestep limit, explicit time integration.
-- Pressure projection with a separable-FFT preconditioned BiCGSTAB
-  solve.
-- Discrete-ordinates radiation parallelised over ordinates.
-- Python with numba-compiled kernels; production runs use 12 threads.
-- Every parallel kernel uses a read-old, write-new double-buffer
-  pattern and is bit-exact reproducible across runs at a fixed thread
-  count.
+- Finite volume, MUSCL advection, explicit time stepping with a
+  per-cell diffusive limit.
+- Pressure projection, separable-FFT preconditioned BiCGSTAB.
+- DOM parallelised over ordinates.
+- Python + numba kernels, 12 threads; bit-exact reproducible at fixed
+  thread count.
 
 ## Working practice
 
-- Every input parameter carries its source in the deck: measurement
-  database, paper, or calibration case.
-- Every case-defining parameter is traced to the experiment before a
-  validation run starts. A missing value blocks the run.
-- One calibration condition per material; all other conditions are
-  validation only.
-- Acceptance bands are written down before results are seen and are not
-  widened afterwards.
-- A validation result outside the band is recorded with its physical
-  cause and carried as a known limitation.
-- Non-measurable parameters are identical across all cases of the same
-  material.
-- Each new kernel ships with unit tests for bit-exact determinism and
-  at least one conservation, limiting-case or bounds check.
-- Recent validation cases are re-run before physics changes are
-  committed.
-- Variable names carry the quantity and its units.
-
-Roughly 35 000 lines of model code and 85 test modules at the time of
-writing.
+- Every deck parameter cites its source.
+- Case parameters traced to the experiment before a run; a missing
+  value blocks the run.
+- One calibration condition per material; the rest are validation only.
+- Acceptance bands fixed before results are seen.
+- Out-of-band results recorded with physical cause as known limitations.
+- Kernels ship with determinism and conservation/bounds unit tests.
 
 ## Work to come
 
-- Re-run the wind sweep on a 113 m domain with fuel-free buffers at both
-  ends, so that the spread-rate fit window is clear of outlet backflow.
-- Resolve the wind exponent: the model spreads as U₂ to the power 1.46
-  against 0.99 measured.
-- Characterise the 7 to 9 s surge cycle in the spread rate and its
-  coupling to the turbulence field.
-- Extend from the two-dimensional slice to a finite fireline with
-  lateral spread.
-- Add a suppression module (water spray, agent application) on top of
-  the validated baseline.
+- Wind sweep on a 113 m domain with fuel-free buffers at both ends.
+- Wind exponent: model 1.46, measured 0.99.
+- Surge cycle in spread rate, 7–9 s period.
+- Finite fireline with lateral spread.
+- Suppression module on the validated baseline.
 
 ## References
 
-- Cheney, N. P., Gould, J. S., Catchpole, W. R. (1993). The influence of
-  fuel, weather and fire shape variables on fire-spread in grasslands.
-  *International Journal of Wildland Fire* 3(1), 31–44.
-- Mell, W., Jenkins, M. A., Gould, J., Cheney, P. (2007). A physics-based
-  approach to modelling grassland fires. *International Journal of
-  Wildland Fire* 16(1), 1–22.
-- Magnussen, B. F. (1981). On the structure of turbulence and a
-  generalized eddy dissipation concept for chemical reaction in
-  turbulent flow. 19th AIAA Aerospace Sciences Meeting.
+- Cheney, Gould, Catchpole (1993). *Int. J. Wildland Fire* 3(1), 31–44.
+- Mell, Jenkins, Gould, Cheney (2007). *Int. J. Wildland Fire* 16(1), 1–22.
+- Magnussen (1981). 19th AIAA Aerospace Sciences Meeting, AIAA-81-0042.
