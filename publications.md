@@ -13,4 +13,4 @@
 - Talbot, J., Kulkarni, A., Edwards, J. R., Lin, K.-C., Bornhoft, B.
   (2018). Eulerian-Lagrangian simulation of aerated liquid injection
   into a subsonic crossflow. *ICLASS 2018, 14th Triennial International
-  Conference on Liquid Atomization and Spray Systems*, Chicago.
+  Conference on Liquid Atomization and Spray Systems*.
