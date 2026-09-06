@@ -68,7 +68,7 @@ Otherwise the particle slides through contact, with friction
 coefficient $\mu$:
 
 $$
-u_2 = u_1 - \mu(1+e) v_1 \epsilon_0, \qquad v_2 = -e v_1, \qquad \omega_2 = \omega_1 + 5\mu(1+e)\frac{v_1}{D}\epsilon_0, \qquad \epsilon_0 = \operatorname{sign}\left(u_1 - \tfrac{D}{2}\omega_1\right)
+u_2 = u_1 - \mu(1+e) v_1 \epsilon_0, \qquad v_2 = -e v_1, \qquad \omega_2 = \omega_1 + 5\mu(1+e)\frac{v_1}{D}\epsilon_0, \qquad \epsilon_0 = \mathrm{sign}\left(u_1 - \tfrac{D}{2}\omega_1\right)
 $$
 
 ![Impulse sliding rebound angle against Tabakoff](figures/rebound_impulse_sliding.png)
@@ -81,7 +81,7 @@ The tilt scale depends on whether the particle is smaller or larger than
 the roughness peak spacing $RS_m$:
 
 $$
-\Delta\gamma = \operatorname{atan}\left(\frac{2R_a}{RS_m}\right) \quad \text{if} \quad D < \frac{RS_m}{\sin\left(\operatorname{atan}(2R_a/RS_m)\right)}, \qquad \Delta\gamma = \operatorname{atan}\left(\frac{2R_q}{RS_m}\right) \quad \text{otherwise}
+\Delta\gamma = \arctan\left(\frac{2R_a}{RS_m}\right) \quad \text{if} \quad D < \frac{RS_m}{\sin\left(\arctan(2R_a/RS_m)\right)}, \qquad \Delta\gamma = \arctan\left(\frac{2R_q}{RS_m}\right) \quad \text{otherwise}
 $$
 
 with $R_a$ the average roughness and $R_q$ its standard deviation.
