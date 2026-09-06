@@ -20,12 +20,12 @@ $$
 
 $$
 \partial_t(\rho Y_i) + \nabla\cdot(\rho\mathbf{u}Y_i)
-= \nabla\cdot\Big(\rho\big(D+\tfrac{\nu_t}{Sc_t}\big)\nabla Y_i\Big) + \dot\omega_i
+= \nabla\cdot\left(\rho\big(D+\tfrac{\nu_t}{Sc_t}\big)\nabla Y_i\right) + \dot\omega_i
 $$
 
 $$
 \partial_t(\rho h) + \nabla\cdot(\rho\mathbf{u}h)
-= \nabla\cdot\Big(\rho\big(\alpha+\tfrac{\nu_t}{Pr_t}\big)\nabla h\Big)
+= \nabla\cdot\left(\rho\big(\alpha+\tfrac{\nu_t}{Pr_t}\big)\nabla h\right)
 + \dot q'''_{c} - \nabla\cdot\mathbf{q}_r - \dot q'''_{s\to g}
 $$
 
@@ -39,9 +39,9 @@ Eddy Dissipation Concept, single-step fuel gas + oxygen:
 
 $$
 \dot\omega_F = \rho\,\frac{\gamma^{*}}{\tau^{*}}\,
-\min\!\Big(Y_F,\ \frac{Y_{O_2}}{s}\Big), \qquad
+\min\left(Y_F, \frac{Y_{O_2}}{s}\right), \qquad
 \tau^{*} \propto \sqrt{\nu/\varepsilon}, \quad
-\gamma^{*} \propto \Big(\frac{\nu\varepsilon}{k^2}\Big)^{1/4}
+\gamma^{*} \propto \left(\frac{\nu\varepsilon}{k^2}\right)^{1/4}
 $$
 
 ## Radiation
@@ -70,12 +70,12 @@ m_p c_p \frac{dT_p}{dt}
 $$
 
 $$
-\dot m_w = -A_w m_w \exp\!\Big(-\frac{E_w}{R T_p}\Big), \qquad
-\dot m_d = -A_{py} m_d \exp\!\Big(-\frac{E_{py}}{R T_p}\Big)
+\dot m_w = -A_w m_w \exp\left(-\frac{E_w}{R T_p}\right), \qquad
+\dot m_d = -A_{py} m_d \exp\left(-\frac{E_{py}}{R T_p}\right)
 $$
 
 $$
-\dot m_c = -A_{ox} m_c\, Y_{O_2}\exp\!\Big(-\frac{E_{ox}}{R T_p}\Big)
+\dot m_c = -A_{ox} m_c\, Y_{O_2}\exp\left(-\frac{E_{ox}}{R T_p}\right)
 \quad\text{(diffusion-limited)}
 $$
 
