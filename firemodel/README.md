@@ -38,10 +38,10 @@ the ground.
 Eddy Dissipation Concept, single-step fuel gas + oxygen:
 
 $$
-\dot\omega_F = \rho\,\frac{\gamma^{*}}{\tau^{*}}\,
+\dot\omega_F = \rho\,\frac{\gamma^{\ast}}{\tau^{\ast}}\,
 \min\left(Y_F, \frac{Y_{O_2}}{s}\right), \qquad
-\tau^{*} \propto \sqrt{\nu/\varepsilon}, \quad
-\gamma^{*} \propto \left(\frac{\nu\varepsilon}{k^2}\right)^{1/4}
+\tau^{\ast} \propto \sqrt{\nu/\varepsilon}, \quad
+\gamma^{\ast} \propto \left(\frac{\nu\varepsilon}{k^2}\right)^{1/4}
 $$
 
 ## Radiation
