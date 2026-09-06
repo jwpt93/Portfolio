@@ -10,7 +10,7 @@
   jets in supersonic and subsonic crossflows*. M.S. thesis, North
   Carolina State University.
 
-<!-- Third item pending title and year:
-- Talbot, J. W., Kulkarni, A., Edwards, J. R., Lin, K.-C., Bornhoft, B. J.
-  AIAA conference paper on aerated liquid jets in crossflow.
--->
+- Talbot, J., Kulkarni, A., Edwards, J. R., Lin, K.-C., Bornhoft, B.
+  (2018). Eulerian-Lagrangian simulation of aerated liquid injection
+  into a subsonic crossflow. *ICLASS 2018, 14th Triennial International
+  Conference on Liquid Atomization and Spray Systems*, Chicago.
